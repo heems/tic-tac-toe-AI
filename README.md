@@ -1,4 +1,4 @@
 tic-tac-toe-AI
 ==============
 
-tic tac tae AI
+tic tac toe AI
