@@ -1,6 +1,27 @@
+#HUMAN IS X
+#COMPUTER IS O
+#COMPUTER WANTS 1
+#HUMAN WANTS -1
+
 board = [[" " for i in range(0, 3)] for i in range(0, 3)]
 
-print board
+COMPUTER = True
+HUMAN = False
+
+class Move:
+	def __init__(self):
+		self.row = -1
+		self.column = -1
+
+
+class Best:
+	def __init__(self, move, computer):
+		self.move = move
+		if computer:
+			self.score = -2
+		else:
+			self.score = 2
+
 
 def print_board():
 	print "\n\n"	
@@ -54,9 +75,39 @@ def win(player):
 		if r == 0:
 			return True
 
-def computer_move():
-	print "computer"
+def possible_moves():
+	empty = []
+	for r in range(0, 3):
+		for c in range(0, 3):
+			if board[r][c] == " ":
+				m = Move()
+				m.row = r
+				m.column = c
+				empty.append(m)
+	return empty
 
+
+
+def computer_move():
+	best = choose_move(True)
+	move = best.move
+	board[move.row][move.column] = "O"
+
+#if side is true, computers turn
+#if side is false, humans turn
+def choose_move(side):
+	my_best = Best(Move(), side)
+	for move in possible_moves():
+		if side is COMPUTER:
+			board[move.row][move.column] = "O"
+		else:
+			board[move.row][move.column] = "X"
+		response = choose_move(not side)
+		board[move.row][move.column] = " "
+		if side is COMPUTER and response.score >= my_best.score or side is HUMAN and response.score <= my_best.score:
+			my_best.move = move
+			my_best.score = response.score
+	return my_best
 
 
 current_player = "X"
