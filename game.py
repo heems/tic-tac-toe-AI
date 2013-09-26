@@ -8,6 +8,8 @@ board = [[" " for i in range(0, 3)] for i in range(0, 3)]
 COMPUTER = True
 HUMAN = False
 
+
+
 class Move:
 	def __init__(self):
 		self.row = -1
@@ -58,7 +60,7 @@ def win(player):
 		for c in range(0, 3):
 			if board[c][r] != player:
 				break
-			if r == 2:
+			if c == 2:
 				return True
 
 	#diagonal
@@ -69,10 +71,10 @@ def win(player):
 			return True
 
 	#reverse diagonal
-	for r in range(2, -1, -1):
-		if board[r][r] != player:
+	for r in range(0, 3):
+		if board[2 - r][r] != player:
 			break
-		if r == 0:
+		if r == 2:
 			return True
 
 def possible_moves():
@@ -91,29 +93,51 @@ def possible_moves():
 def computer_move():
 	best = choose_move(True)
 	move = best.move
+	#print move.row
+	#print move.column
 	board[move.row][move.column] = "O"
 
 #if side is true, computers turn
 #if side is false, humans turn
 def choose_move(side):
 	my_best = Best(Move(), side)
-	for move in possible_moves():
-		if side is COMPUTER:
-			board[move.row][move.column] = "O"
-		else:
-			board[move.row][move.column] = "X"
-		response = choose_move(not side)
-		board[move.row][move.column] = " "
-		if side is COMPUTER and response.score >= my_best.score or side is HUMAN and response.score <= my_best.score:
-			my_best.move = move
-			my_best.score = response.score
+	moves = possible_moves()
+	if not moves:
+		my_best.score = calculate_board_score(side)
+	else:
+		for move in moves:
+			if side is COMPUTER:
+				board[move.row][move.column] = "O"
+			else:
+				board[move.row][move.column] = "X"
+			response = choose_move(not side)
+			board[move.row][move.column] = " "
+			if side is COMPUTER and response.score >= my_best.score or side is HUMAN and response.score <= my_best.score:
+				my_best.move = move
+				my_best.score = response.score
 	return my_best
+
+def calculate_board_score(side):
+	if not win("X") and not win("O"):
+		return 0
+	if side is COMPUTER:
+		if win("O"):
+			return 1
+		else:
+			return -1
+	if side is HUMAN:
+		if win("X"):
+			return -1
+		else:
+			return 1
 
 
 current_player = "X"
-while not win(current_player):
+while True:
 	print_board()
 	choose_spot() if current_player == "X" else computer_move()
+	if win(current_player):
+		break
 	if current_player == "X":
 		current_player = "O"
 	else:
